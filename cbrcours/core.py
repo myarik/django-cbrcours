@@ -46,9 +46,8 @@ class CBR_COURSE(object):
             for valute in cbr['ValCurs']['Valute']:
                 valutes_dict[valute['CharCode']] = {
                     'name': valute['Name'],
-                    'value': Decimal(
-                        valute['Value'].replace(',', '.')).quantize(
-                            Decimal('.01'))
+                    'value': Decimal(valute['Value'].replace(',', '.')).quantize(Decimal("0.0001")),
+                    'nominal': int(valute['Nominal'])
                 }
             return valutes_dict
         return
@@ -84,5 +83,5 @@ class CBR_COURSE(object):
     def calculate_price(self, price, currency):
         price = Decimal(price)
         currency = self.get(currency)
-        price = price * currency.get('value')
+        price = price * currency.get('value') / (currency.get('nominal') or 1)
         return price.quantize(Decimal("0.01"), rounding=ROUND_UP)
